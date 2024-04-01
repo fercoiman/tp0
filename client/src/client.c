@@ -31,7 +31,7 @@ int main(void)
 	puerto = config_get_string_value(config,"PUERTO");
 	valor = config_get_string_value(config,"CLAVE");
 
-	log_info(logger,"valores leidos >>> IP=%s PUERTO=%s CLAVE= %s", ip,puerto,valor);
+	log_info(logger,"valores de la config >>> IP=%s PUERTO=%s CLAVE= %s", ip,puerto,valor);
 	// log_info(logger,"valor leido: %s", puerto);
 	// log_info(logger,"valor leido: %s", valor);
 	// Usando el config creado previamente, leemos los valores del config y los 
@@ -47,9 +47,14 @@ int main(void)
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
 	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
-
+		
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
+
+	if(connect(conexion, server_info->ai_addr, server_info->ai_addrlen) != 0) {
+		perror("NO SE HA PODIDO CONECTAR AL SERVIDOR");
+		exit(EXIT_FAILURE);
+	}
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 
@@ -65,7 +70,7 @@ int main(void)
 t_log* iniciar_logger(void)
 {
 	//t_log* nuevo_logger;
-	t_log* nuevo_logger = log_create("client.log","Client.proc",1,LOG_LEVEL_INFO);
+	t_log* nuevo_logger = log_create("client.log","client.proc",1,LOG_LEVEL_INFO);
 	
 	if(nuevo_logger == NULL){
 			perror("!! Se ha detectado un error en la creacion del log !!");
@@ -96,6 +101,7 @@ void leer_consola(t_log* logger)
 	while (strlen(leido)!=0){
 		leido = readline("> ");
 		log_info(logger,"LEIDO DESDE CONSOLA>>> %s",leido);
+		free(leido);
 	}
 		printf("SE INGRESO UNA LINEA VACIA! SALIENDO...\n\n");
 	// ¡No te olvides de liberar las lineas antes de regresar!

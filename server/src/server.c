@@ -1,9 +1,15 @@
 #include "server.h"
 
 int main(void) {
-	logger = log_create("log.log", "Servidor", 1, LOG_LEVEL_DEBUG);
+	logger = log_create("server.log", "server.proc", 1, LOG_LEVEL_DEBUG);
 
-	int server_fd = iniciar_servidor();
+
+	int server_fd = iniciar_servidor(); //el int que devuelve es el socket del servidor
+	if (server_fd < 0){
+		log_info(logger, "NO SE  PUDO INICIAR SERVIDOR.\n");
+		exit(EXIT_FAILURE);
+	}
+	
 	log_info(logger, "Servidor listo para recibir al cliente");
 	int cliente_fd = esperar_cliente(server_fd);
 
