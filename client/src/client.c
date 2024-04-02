@@ -51,13 +51,14 @@ int main(void)
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
 
-	if(connect(conexion, server_info->ai_addr, server_info->ai_addrlen) != 0) {
-		perror("NO SE HA PODIDO CONECTAR AL SERVIDOR");
-		exit(EXIT_FAILURE);
-	}
+	//  if(connect(conexion, server_info->ai_addr, server_info->ai_addrlen) != 0) {
+	//  	perror("NO SE HA PODIDO CONECTAR AL SERVIDOR");
+	//  	exit(EXIT_FAILURE);
+	//  }
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
-
+	
+	enviar_mensaje(valor,conexion);
 	// Armamos y enviamos el paquete
 	paquete(conexion);
 
@@ -98,12 +99,20 @@ void leer_consola(t_log* logger)
 	leido = readline("> ");
 	log_info(logger,"LEIDO DESDE CONSOLA>>> %s",leido);
 	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
-	while (strlen(leido)!=0){
-		leido = readline("> ");
-		log_info(logger,"LEIDO DESDE CONSOLA>>> %s",leido);
+	size_t largo;
+
+	while(strcmp(leido,"")!= 0){
 		free(leido);
+		leido = readline("> ");
+		largo = strlen(leido);
+	
+		if( largo==0 ){ 
+			log_info(logger,"SE INGRESO UNA LINEA VACIA! SALIENDO!!\n");
+			break;
+		}
+			log_info(logger,"LEIDO DESDE CONSOLA>>> %s",leido);
+			
 	}
-		printf("SE INGRESO UNA LINEA VACIA! SALIENDO...\n\n");
 	// ¡No te olvides de liberar las lineas antes de regresar!
 	free(leido);
 }
@@ -125,8 +134,12 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
-	log_destroy(logger);
-	config_destroy(config);
+	if(logger != NULL){
+		log_destroy(logger);
+	}
+	if(config != NULL){
+		config_destroy(config);
+		}
 
 
 
